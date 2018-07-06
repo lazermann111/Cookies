@@ -8,7 +8,7 @@ import java.io.IOException;
 public class HttpClient
 {
 
-    public static String BASE_URL = "localhost:8001";
+    public static String BASE_URL = "https://coffee-shop-test.herokuapp.com/";
 
 
     static
@@ -40,14 +40,24 @@ public class HttpClient
     }
 
 
+    public static void main(String[] args) {
+
+        CookieInfoDto d = new CookieInfoDto();
+        d.setProxy("111.1.1.1:111");
+        d.setCookie("sdsdsdsdsd");
+
+        HttpClient.addNewCookie(d);
+    }
+
     public static void addNewCookie(CookieInfoDto cookieInfoDto)
     {
 
         try
         {
-            Unirest.get(BASE_URL + "/addCookie")
-                    .routeParam("proxy", cookieInfoDto.getProxy())
-                    .routeParam("cookie", cookieInfoDto.getCookie());
+            Unirest.post(BASE_URL + "/cookies/addCookie")
+                    .field("proxy", cookieInfoDto.getProxy())
+                    .field("cookie", cookieInfoDto.getCookie())
+            .asString();
         }
 
         catch (Exception e)
