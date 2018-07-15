@@ -11,7 +11,7 @@ public class HttpClient
 {
 
     public static String BASE_URL = "https://coffee-shop-test.herokuapp.com/";
-    //public static String BASE_URL = "http://localhost:8081/";
+    // public static String BASE_URL = "http://localhost:8081/";
 
 
     static
@@ -53,6 +53,7 @@ public class HttpClient
             Unirest.post(BASE_URL + "/cookies/addCookie")
                     .field("proxy", cookieInfoDto.getProxy())
                     .field("cookie", cookieInfoDto.getCookie())
+                    .field("userAgent", cookieInfoDto.getUserAgent())
             .asString();
         }
 
@@ -67,15 +68,37 @@ public class HttpClient
 
     public static void main(String[] args) {
 
+        com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+
+        CookieInfoDto res = new CookieInfoDto();
+
+        UserAgent ua = new UserAgent("sdsdsd", "300","200");
+
+        res.setProxy("217.23.3.169:20031");
+        res.setCookie("jasgdfjgb4b4btfhbvygyubegyfebfdgngnfgn");
+
+        try
+        {
+            res.setUserAgent(objectMapper.writeValueAsString(ua));
+        } catch (JsonProcessingException e)
+        {
+            e.printStackTrace();
+        }
+        HttpClient.addNewCookie(res);
+
+        res.setProxy("1");
+        HttpClient.addNewCookie(res);
+
+        res.setProxy("2");
+        HttpClient.addNewCookie(res);
+
+
+        res.setProxy("3");
+        HttpClient.addNewCookie(res);
+
 
 
         CookieInfoDto a =  HttpClient.getCookie("217.23.3.169:20031");
-        CookieInfoDto b =  HttpClient.getCookie("217.23.3.169:20030");
-        CookieInfoDto c =  HttpClient.getCookie("1111.3453.345.169:3545345");
-
-
-        com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
-
 
 
         try {
@@ -83,7 +106,8 @@ public class HttpClient
             CollectionType javaType = objectMapper.getTypeFactory().constructCollectionType(Set.class, CookieClone.class);
             Set<CookieClone> asList = objectMapper.readValue(a.getCookie(), javaType);
             // readValue = objectMapper.readValue(, Set.class);
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             e.printStackTrace();
         }
     }

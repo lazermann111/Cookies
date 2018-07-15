@@ -6,7 +6,16 @@ public class CookieInfoDto {
     private int id;
     private String proxy;
     private String cookie;
+    private String userAgent;
 
+
+    public String getUserAgent() {
+        return userAgent;
+    }
+
+    public void setUserAgent(String userAgent) {
+        this.userAgent = userAgent;
+    }
 
     public String getProxy() {
         return proxy;
