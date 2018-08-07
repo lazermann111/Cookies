@@ -1,6 +1,5 @@
 package bots;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import model.CookieInfoDto;
 import model.UserAgent;
 import org.openqa.selenium.*;
@@ -22,7 +21,10 @@ public class VideoViewerBot
 {
 
     private static int THREAD_COUNT = 2;
+
+    //
     private static int TIMEOUT_FOR_ONE_DRIVER = 200000;
+
     private static int LAUNCH_INTERVAL = 5000;
     private static int UA_TO_SKIP = 1000;
 
@@ -83,8 +85,11 @@ public class VideoViewerBot
                             try
                             {
                               c = new VideoViewerBot();
-                                c.init(null);
-                                Thread.sleep(TIMEOUT_FOR_ONE_DRIVER);
+                              //todo pass video URL
+                              c.init(null);
+
+                              //todo parse video lenght and wait accordingly
+                              Thread.sleep(TIMEOUT_FOR_ONE_DRIVER);
 
                             }
                             catch (Exception e)
@@ -100,6 +105,7 @@ public class VideoViewerBot
                     Timer timer = new Timer();
 
                     // scheduling the task at fixed rate delay
+                    //todo parse video lenght and wait accordingly
                     timer.scheduleAtFixedRate(tasknew,500,TIMEOUT_FOR_ONE_DRIVER + 10000);
             Thread.sleep(LAUNCH_INTERVAL);
          }
@@ -128,6 +134,8 @@ public class VideoViewerBot
 
         options.addArguments("--proxy-server=socks5://" + proxyUrl+proxyPort);
         options.addArguments("--user-agent=" + ua.getAgent());
+        //todo add referrer
+        //
 
         driver = new ChromeDriver(options);
 
@@ -149,10 +157,11 @@ public class VideoViewerBot
         driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
         driver.get("https://youtube.com");
-        Thread.sleep(30000);
+        //todo parse video lenght and wait accordingly
 
 
-      if(youTubeActions())
+
+     /* if(youTubeActions())
       {
           Set<Cookie> cookies = driver.manage().getCookies();
 
@@ -166,7 +175,7 @@ public class VideoViewerBot
           d.setUserAgent(s2);
           HttpClient.addNewCookie(d);
 
-      }
+      }*/
 
         return this;
     }
@@ -175,56 +184,6 @@ public class VideoViewerBot
     {
         if(driver !=null)
         driver.close();
-    }
-
-    private boolean youTubeActions()
-    {
-
-        boolean clicked = false;
-
-       // driver.findElements(By.className("yt-lockup-thumbnail"))
-        for (WebElement e : driver.findElements(By.className("yt-lockup-thumbnail")))
-        {
-            try
-            {
-                e.click();
-                clicked = true;
-                break;
-            }
-            catch (Exception e1){
-                AppiumLogger.log("skipped0");}
-        }
-        if(!clicked)
-        {
-            for (WebElement e : driver.findElements(By.className("ytd-thumbnail"))) {
-                try {
-                    e.click();
-                    clicked = true;
-                    break;
-                } catch (Exception e1) {
-                    AppiumLogger.log("skipped1");
-                }
-            }
-        }
-            if(!clicked)
-            {
-                for (WebElement e : driver.findElements(By.className("video-thumbnail-img")))
-             {
-                  try
-                  {
-                      e.click();
-                      clicked = true;
-                      break;
-                  }
-                   catch (Exception e1){
-                       AppiumLogger.log("skipped2");}
-              }
-            }
-
-            if(!clicked) AppiumLogger.log("STILL NOT CLICKED!");
-
-        return clicked;
-
     }
 
 
