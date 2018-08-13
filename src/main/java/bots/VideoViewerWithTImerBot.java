@@ -5,17 +5,16 @@ import model.UserAgent;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 import javax.net.ssl.HttpsURLConnection;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -117,7 +116,7 @@ public class VideoViewerWithTImerBot {
             BufferedReader in = new BufferedReader(new InputStreamReader(uc.getInputStream()));
             while ((line = in.readLine()) != null) {
                 tmp.append(line);
-                //     Log.e("doc", String.valueOf(line));
+                // System.out.println("doc"+String.valueOf(line));
             }
             Document doc = Jsoup.parse(String.valueOf(tmp));
 
@@ -192,8 +191,12 @@ public class VideoViewerWithTImerBot {
         options.addArguments("ignore-certificate-errors");
         options.addArguments("--ignore-ssl-errors");
         options.addArguments("--no-referrers");
-        //  options.addArguments( "--start-maximized" );
+        options.addArguments("--start-maximized");
+        options.addExtensions(new File("./lib/ref.crx"));
 
+        //options.addArguments("load-extension=./ref");
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        capabilities.setCapability(ChromeOptions.CAPABILITY, options);
         UserAgent ua = userAgentsDesktop.poll();
 
         System.out.println("instanceNumber " + instanceNumber);
@@ -208,16 +211,11 @@ public class VideoViewerWithTImerBot {
         options.addArguments("--proxy-server=socks5://" + proxyUrl + proxyPort);
         options.addArguments("--user-agent=" + ua.getAgent());
         //todo add referrer
-        //
-
         driver = new ChromeDriver(options);
-
         try {
             int w = Integer.parseInt(ua.getWidth());
             int h = Integer.parseInt(ua.getHeight());
-
             driver.manage().window().setSize(new Dimension(w, h));
-
         } catch (Exception e) {
             e.printStackTrace();
             AppiumLogger.log("Error while parsing screen resolution! " + ua.getWidth() + " " + ua.getHeight());
@@ -228,7 +226,17 @@ public class VideoViewerWithTImerBot {
         Thread.sleep(2000);
         JavascriptExecutor js = (JavascriptExecutor) driver;
         driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-
+        driver.get("chrome-extension://hnkcfpcejkafcihlgbojoidoihckciin/chrome/content/options.html");
+        try {
+            driver.findElement(By.cssSelector("tr#defaultAction td.specific.center.inActive[name='specific'][filter='specific']")).click();
+            driver.findElement(By.cssSelector("input.site[type='text'][rel='site'][autocomplete='off'][maxlength='1000'][value=''][role='textbox']"))
+                    .click();
+            driver.findElement(By.cssSelector("input.site[type='text'][rel='site'][autocomplete='off'][maxlength='1000'][value=''][role='textbox']"))
+                    .sendKeys("https://*youtube.com");
+            driver.findElement(By.cssSelector("tr#defaultAction td.specific.center.specificActive[name='specific'][filter='specific']")).click();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         driver.get("https://youtube.com/watch?v=" + videoId);
         //todo parse video lenght and wait accordingly
 
